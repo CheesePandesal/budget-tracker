@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Supabase Setup 🚀
+
+This project includes Supabase integration! To get started:
+
+1. **Read the setup guide:** Check out `README_SUPABASE.md` for detailed instructions
+2. **Quick start:** See `QUICK_START.md` for a 5-minute setup
+3. **Full documentation:** Check `SUPABASE_SETUP.md` for comprehensive details
+
+**What's installed:**
+- `@supabase/supabase-js` - Supabase JavaScript client
+- `@supabase/ssr` - SSR support for Next.js
+- Example component in `app/components/TransactionExample.tsx`
+
 ## Getting Started
 
 First, run the development server:
