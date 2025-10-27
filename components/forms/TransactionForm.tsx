@@ -11,7 +11,6 @@ import { Category, TransactionFormData, CreateTransactionData } from '@/types';
 interface TransactionFormProps {
   categories: Category[];
   onSubmit: (data: CreateTransactionData) => Promise<void>;
-  loading?: boolean;
   initialData?: Partial<TransactionFormData>;
 }
 
@@ -26,7 +25,7 @@ const paymentMethods = [
   'Other'
 ];
 
-export function TransactionForm({ categories, onSubmit, loading = false, initialData }: TransactionFormProps) {
+export function TransactionForm({ categories, onSubmit, initialData }: TransactionFormProps) {
   const [formData, setFormData] = useState<TransactionFormData>({
     category_id: initialData?.category_id || '',
     amount: initialData?.amount || '',
@@ -98,18 +97,18 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
   const expenseCategories = categories.filter(cat => !cat.is_income);
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
       {/* Transaction Details Section */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-foreground">Transaction Details</h3>
-          <p className="text-sm text-muted-foreground">Basic information about your transaction</p>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">Transaction Details</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">Basic information about your transaction</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {/* Transaction Type */}
           <div className="space-y-2">
-            <Label htmlFor="transaction_type" className="text-sm font-medium text-foreground">Transaction Type *</Label>
+            <Label htmlFor="transaction_type" className="text-xs sm:text-sm font-medium text-foreground">Transaction Type *</Label>
             <Select
               value={formData.transaction_type}
               onValueChange={(value: 'income' | 'expense') =>
@@ -128,7 +127,7 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category_id" className="text-sm font-medium text-foreground">Category *</Label>
+            <Label htmlFor="category_id" className="text-xs sm:text-sm font-medium text-foreground">Category *</Label>
             <Select
               value={formData.category_id}
               onValueChange={(value) =>
@@ -151,16 +150,16 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
       </div>
 
       {/* Financial Information Section */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-foreground">Financial Information</h3>
-          <p className="text-sm text-muted-foreground">Amount and timing details</p>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">Financial Information</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">Amount and timing details</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {/* Amount */}
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-sm font-medium text-foreground">Amount (₱) *</Label>
+            <Label htmlFor="amount" className="text-xs sm:text-sm font-medium text-foreground">Amount (₱) *</Label>
             <Input
               id="amount"
               type="number"
@@ -170,34 +169,36 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
               value={formData.amount}
               onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
               required
+              className="text-sm sm:text-base"
             />
           </div>
 
           {/* Transaction Date */}
           <div className="space-y-2">
-            <Label htmlFor="transaction_date" className="text-sm font-medium text-foreground">Date *</Label>
+            <Label htmlFor="transaction_date" className="text-xs sm:text-sm font-medium text-foreground">Date *</Label>
             <Input
               id="transaction_date"
               type="date"
               value={formData.transaction_date}
               onChange={(e) => setFormData(prev => ({ ...prev, transaction_date: e.target.value }))}
               required
+              className="text-sm sm:text-base"
             />
           </div>
         </div>
       </div>
 
       {/* Additional Details Section */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-foreground">Additional Details</h3>
-          <p className="text-sm text-muted-foreground">Optional information to help track your transaction</p>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">Additional Details</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">Optional information to help track your transaction</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {/* Payment Method */}
           <div className="space-y-2">
-            <Label htmlFor="payment_method" className="text-sm font-medium text-foreground">Payment Method</Label>
+            <Label htmlFor="payment_method" className="text-xs sm:text-sm font-medium text-foreground">Payment Method</Label>
             <Select
               value={formData.payment_method}
               onValueChange={(value) =>
@@ -219,44 +220,46 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
 
           {/* Location */}
           <div className="space-y-2">
-            <Label htmlFor="location" className="text-sm font-medium text-foreground">Location</Label>
+            <Label htmlFor="location" className="text-xs sm:text-sm font-medium text-foreground">Location</Label>
             <Input
               id="location"
               placeholder="Where did this transaction happen?"
               value={formData.location}
               onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+              className="text-sm sm:text-base"
             />
           </div>
         </div>
       </div>
 
       {/* Description Section */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-foreground">Description</h3>
-          <p className="text-sm text-muted-foreground">Add more context about this transaction</p>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">Description</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">Add more context about this transaction</p>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="description" className="text-sm font-medium text-foreground">Description</Label>
+          <Label htmlFor="description" className="text-xs sm:text-sm font-medium text-foreground">Description</Label>
           <Textarea
             id="description"
             placeholder="What was this transaction for?"
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            className="text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
           />
         </div>
       </div>
 
       {/* Tags Section */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-foreground">Tags</h3>
-          <p className="text-sm text-muted-foreground">Add tags to categorize and filter your transactions</p>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">Tags</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">Add tags to categorize and filter your transactions</p>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="tags" className="text-sm font-medium text-foreground">Tags</Label>
+          <Label htmlFor="tags" className="text-xs sm:text-sm font-medium text-foreground">Tags</Label>
           <div className="flex gap-2">
             <Input
               id="tags"
@@ -269,8 +272,9 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
                   addTag();
                 }
               }}
+              className="text-sm sm:text-base"
             />
-            <Button type="button" onClick={addTag} variant="outline">
+            <Button type="button" onClick={addTag} variant="outline" className="px-3 sm:px-4">
               Add
             </Button>
           </div>
@@ -279,13 +283,13 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
               {formData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-sm rounded-md"
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary text-xs sm:text-sm rounded-md"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="ml-1 hover:text-destructive"
+                    className="ml-1 hover:text-destructive text-sm"
                   >
                     ×
                   </button>
@@ -298,8 +302,8 @@ export function TransactionForm({ categories, onSubmit, loading = false, initial
 
       {/* Submit Button */}
       <div className="pt-4 border-t border-border">
-        <Button type="submit" className="w-full" disabled={loading} size="lg">
-          {loading ? 'Adding Transaction...' : 'Add Transaction'}
+        <Button type="submit" className="w-full text-sm sm:text-base" size="lg">
+          Add Transaction
         </Button>
       </div>
     </form>

@@ -7,107 +7,79 @@ import { Transaction, CreateTransactionData, Category } from '@/types';
 export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Using the supabase client from lib
 
   // Fetch transactions
   const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('transactions')
-        .select(`
-          *,
-          category:categories(*)
-        `)
-        .order('transaction_date', { ascending: false });
+    const { data, error } = await supabase
+      .from('transactions')
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .order('transaction_date', { ascending: false });
 
-      if (error) throw error;
-      setTransactions(data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch transactions');
-    } finally {
-      setLoading(false);
-    }
+    if (error) throw error;
+    setTransactions(data || []);
   };
 
   // Fetch categories
   const fetchCategories = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('name');
 
-      if (error) throw error;
-      setCategories(data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch categories');
-    }
+    if (error) throw error;
+    setCategories(data || []);
   };
 
   // Create transaction
   const createTransaction = async (transactionData: CreateTransactionData) => {
-    try {
-      const { data, error } = await supabase
-        .from('transactions')
-        .insert([transactionData])
-        .select(`
-          *,
-          category:categories(*)
-        `)
-        .single();
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert([transactionData])
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .single();
 
-      if (error) throw error;
-      setTransactions(prev => [data, ...prev]);
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create transaction');
-      throw err;
-    }
+    if (error) throw error;
+    setTransactions(prev => [data, ...prev]);
+    return data;
   };
 
   // Update transaction
   const updateTransaction = async (id: string, transactionData: Partial<CreateTransactionData>) => {
-    try {
-      const { data, error } = await supabase
-        .from('transactions')
-        .update(transactionData)
-        .eq('id', id)
-        .select(`
-          *,
-          category:categories(*)
-        `)
-        .single();
+    const { data, error } = await supabase
+      .from('transactions')
+      .update(transactionData)
+      .eq('id', id)
+      .select(`
+        *,
+        category:categories(*)
+      `)
+      .single();
 
-      if (error) throw error;
-      setTransactions(prev => 
-        prev.map(t => t.id === id ? data : t)
-      );
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update transaction');
-      throw err;
-    }
+    if (error) throw error;
+    setTransactions(prev => 
+      prev.map(t => t.id === id ? data : t)
+    );
+    return data;
   };
 
   // Delete transaction
   const deleteTransaction = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('transactions')
-        .delete()
-        .eq('id', id);
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', id);
 
-      if (error) throw error;
-      setTransactions(prev => prev.filter(t => t.id !== id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete transaction');
-      throw err;
-    }
+    if (error) throw error;
+    setTransactions(prev => prev.filter(t => t.id !== id));
   };
 
   useEffect(() => {
@@ -118,8 +90,6 @@ export function useTransactions() {
   return {
     transactions,
     categories,
-    loading,
-    error,
     createTransaction,
     updateTransaction,
     deleteTransaction,

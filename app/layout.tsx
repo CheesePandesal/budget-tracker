@@ -27,7 +27,7 @@ export default function RootLayout({
       >
         <Navigation />
         <main className="lg:ml-64 min-h-screen bg-background">
-          <div className="p-6 lg:p-8">
+          <div className="pt-20 sm:pt-24 lg:pt-8 p-4 sm:p-6 lg:p-8">
             {children}
           </div>
         </main>
