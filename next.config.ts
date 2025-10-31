@@ -5,6 +5,16 @@ const nextConfig: NextConfig = {
   experimental: {
     turbopackFileSystemCacheForDev: true,
   },
+  serverExternalPackages: ['@supabase/ssr'],
+  images: {
+    formats: ['image/webp', 'image/avif'],
+  },
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
+  httpAgentOptions: {
+    keepAlive: true,
+  },
 };
 
 export default nextConfig;

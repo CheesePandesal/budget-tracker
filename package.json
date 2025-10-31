@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "analyze": "ANALYZE=true next build",
+    "clean": "rm -rf .next out node_modules/.cache",
+    "db:generate-types": "supabase gen types typescript --project-id YOUR_PROJECT_ID > types/supabase.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

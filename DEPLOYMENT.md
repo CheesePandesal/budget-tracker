@@ -89,6 +89,24 @@ This is the most important step! You need to add your Supabase credentials:
 
 Vercel has **automatic deployments** set up by default. Here's how updates work:
 
+### What Happens During Deployment
+
+When you push to GitHub, **Vercel automatically runs these commands**:
+
+```bash
+npm install       # Install dependencies
+npm run build     # Build your Next.js app
+```
+
+Then it deploys the built files to production.
+
+**So you DON'T need to run `npm run build` yourself before pushing** - Vercel does it for you!
+
+However, running `npm run build` locally before pushing is a **best practice** because:
+- ✅ Catch build errors locally (don't wait for Vercel)
+- ✅ Save time (fix issues before deploying)
+- ✅ Test production build locally
+
 ### How Automatic Deployments Work
 
 **Vercel automatically deploys your app when:**
@@ -102,19 +120,27 @@ Vercel has **automatic deployments** set up by default. Here's how updates work:
 1. **Make Changes Locally**
    ```bash
    # Make your code changes
-   # Test locally with: npm run dev
    ```
 
-2. **Commit and Push to GitHub**
+2. **Test Locally**
+   ```bash
+   npm run dev          # Test in development mode
+   npm run build        # Test production build (optional but recommended)
+   npm run lint         # Check for errors
+   ```
+   
+   ⚠️ **Important**: Running `npm run build` locally before pushing helps catch build errors early. Vercel will still run its own build when you deploy.
+
+3. **Commit and Push to GitHub**
    ```bash
    git add .
    git commit -m "Add new feature: [describe changes]"
    git push origin main
    ```
 
-3. **Vercel Automatically Deploys**
+4. **Vercel Automatically Deploys**
    - Vercel detects the push
-   - Starts a new build automatically
+   - Runs `npm run build` automatically (same as you did locally)
    - Deploys to production
    - You get notified via email
    - Takes 2-3 minutes total

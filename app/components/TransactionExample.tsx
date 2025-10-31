@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import { formatCurrency, formatDate } from '@/lib/utils'
 
 interface Transaction {
   id: string
@@ -119,12 +120,12 @@ export default function TransactionExample() {
               <div>
                 <p className="font-medium">{transaction.description}</p>
                 <p className="text-sm text-gray-500">
-                  {new Date(transaction.created_at).toLocaleDateString()}
+                  {formatDate(transaction.created_at)}
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-bold text-lg">
-                  ${transaction.amount.toFixed(2)}
+                  {formatCurrency(transaction.amount)}
                 </p>
                 <p className="text-xs text-gray-500">{transaction.type}</p>
               </div>

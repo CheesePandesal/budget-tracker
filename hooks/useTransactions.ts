@@ -7,33 +7,46 @@ import { Transaction, CreateTransactionData, Category } from '@/types';
 export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Using the supabase client from lib
 
   // Fetch transactions
   const fetchTransactions = async () => {
-    const { data, error } = await supabase
-      .from('transactions')
-      .select(`
-        *,
-        category:categories(*)
-      `)
-      .order('transaction_date', { ascending: false });
+    try {
+      setError(null);
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          *,
+          category:categories(*)
+        `)
+        .order('transaction_date', { ascending: false });
 
-    if (error) throw error;
-    setTransactions(data || []);
+      if (error) throw error;
+      console.log('Fetched transactions:', data);
+      setTransactions(data || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch transactions');
+      console.error('Error fetching transactions:', err);
+    }
   };
 
   // Fetch categories
   const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('is_active', true)
-      .order('name');
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
 
-    if (error) throw error;
-    setCategories(data || []);
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
   };
 
   // Create transaction
@@ -83,13 +96,25 @@ export function useTransactions() {
   };
 
   useEffect(() => {
-    fetchTransactions();
-    fetchCategories();
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchTransactions(), fetchCategories()]);
+      } catch (err) {
+        console.error('Error loading data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   return {
     transactions,
     categories,
+    loading,
+    error,
     createTransaction,
     updateTransaction,
     deleteTransaction,

@@ -10,8 +10,48 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Family Budget Tracker",
-  description: "Track your family's income and expenses with ease",
+  title: {
+    default: "Family Budget Tracker",
+    template: "%s | Family Budget Tracker"
+  },
+  description: "Track your family's income and expenses with ease. Manage your budget, set financial goals, and achieve financial freedom together.",
+  keywords: ["budget tracker", "family finance", "expense tracking", "income management", "financial planning"],
+  authors: [{ name: "Family Budget Tracker Team" }],
+  creator: "Family Budget Tracker",
+  publisher: "Family Budget Tracker",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'Family Budget Tracker',
+    description: 'Track your family\'s income and expenses with ease. Manage your budget, set financial goals, and achieve financial freedom together.',
+    siteName: 'Family Budget Tracker',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Family Budget Tracker',
+    description: 'Track your family\'s income and expenses with ease. Manage your budget, set financial goals, and achieve financial freedom together.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
