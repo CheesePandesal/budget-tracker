@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { TransactionForm } from '@/components/forms/TransactionForm';
 import { Category, CreateTransactionData } from '@/types';
-import { Plus, X, CheckCircle2, TrendingUp, TrendingDown, DollarSign, FileText } from 'lucide-react';
+import { Plus, CheckCircle2, TrendingUp, TrendingDown, DollarSign, FileText } from 'lucide-react';
 import { createTransaction } from '@/lib/actions';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -115,20 +115,15 @@ export function AddTransactionDialog({ categories, trigger }: AddTransactionDial
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="lg:w-[95vw] lg:max-w-[700px] max-h-[95vh] overflow-y-auto mx-2 sm:mx-0 p-4 sm:p-6 sm:max-h-[90vh]">
-        <DialogHeader className="space-y-2 sm:space-y-3 pb-2 sm:pb-4 relative">
-          <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground pr-8">Add New Transaction</DialogTitle>
+      <DialogContent 
+        className="lg:w-[95vw] lg:max-w-[700px] max-h-[95vh] overflow-y-auto p-4 sm:p-6 sm:max-h-[90vh]"
+        showCloseButton={true}
+      >
+        <DialogHeader className="space-y-2 sm:space-y-3 pb-2 sm:pb-4">
+          <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground pr-8 sm:pr-0">Add New Transaction</DialogTitle>
           <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
             Enter the details for your income or expense transaction.
           </DialogDescription>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute top-0 right-0 h-8 w-8 p-0 sm:hidden"
-            onClick={() => setOpen(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         <TransactionForm
           categories={categories}

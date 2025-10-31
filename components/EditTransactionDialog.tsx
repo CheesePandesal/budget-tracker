@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { TransactionForm } from '@/components/forms/TransactionForm';
 import { Category, Transaction, TransactionFormData, CreateTransactionData } from '@/types';
-import { X, Pencil, TrendingUp, TrendingDown, DollarSign, FileText } from 'lucide-react';
+import { Pencil, TrendingUp, TrendingDown, DollarSign, FileText } from 'lucide-react';
 import { updateTransaction } from '@/lib/actions';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -125,22 +125,17 @@ export function EditTransactionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="lg:w-[95vw] lg:max-w-[700px] max-h-[95vh] overflow-y-auto mx-2 sm:mx-0 p-4 sm:p-6 sm:max-h-[90vh]">
-        <DialogHeader className="space-y-2 sm:space-y-3 pb-2 sm:pb-4 relative">
-          <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground pr-8">
+      <DialogContent 
+        className="lg:w-[95vw] lg:max-w-[700px] max-h-[95vh] overflow-y-auto p-4 sm:p-6 sm:max-h-[90vh]"
+        showCloseButton={true}
+      >
+        <DialogHeader className="space-y-2 sm:space-y-3 pb-2 sm:pb-4">
+          <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground pr-8 sm:pr-0">
             Edit Transaction
           </DialogTitle>
           <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
             Update the details for this transaction.
           </DialogDescription>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute top-0 right-0 h-8 w-8 p-0 sm:hidden"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         <TransactionForm
           key={transaction.id}
