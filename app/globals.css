@@ -156,3 +156,25 @@
     overflow: hidden;
   }
 }
+
+/* Sonner Toast Styling */
+:root {
+  --toast-success-bg: oklch(0.97 0.02 140);
+  --toast-success-border: oklch(0.85 0.08 140);
+  --toast-success-text: oklch(0.15 0 0);
+}
+
+.dark {
+  --toast-success-bg: oklch(0.18 0.02 140);
+  --toast-success-border: oklch(0.4 0.08 140);
+  --toast-success-text: oklch(0.95 0 0);
+}
+
+[data-sonner-toast] {
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: var(--foreground) !important;
+  font-weight: 500 !important;
+}

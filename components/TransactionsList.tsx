@@ -3,14 +3,24 @@
 import { useState } from 'react';
 import { Transaction, Category } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Calendar, Edit, Trash2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Calendar, Edit, Trash2, AlertTriangle, DollarSign, FileText } from 'lucide-react';
 import { AddTransactionDialog } from '@/components/AddTransactionDialog';
 import { EditTransactionDialog } from '@/components/EditTransactionDialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { deleteTransaction } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface TransactionsListProps {
   transactions: Transaction[];
@@ -30,14 +40,22 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
     try {
       const result = await deleteTransaction(deletingTransaction.id);
       if (result.success) {
+        toast.success('Transaction deleted successfully!', {
+          description: `${deletingTransaction.transaction_type === 'income' ? '+' : '-'}${formatCurrency(deletingTransaction.amount)}`,
+        });
         setDeletingTransaction(null);
         router.refresh();
       } else {
         console.error('Failed to delete transaction:', result.error);
-        // You could add toast notification here
+        toast.error('Failed to delete transaction', {
+          description: result.error,
+        });
       }
     } catch (error) {
       console.error('Failed to delete transaction:', error);
+      toast.error('Failed to delete transaction', {
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -181,40 +199,117 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
       )}
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!deletingTransaction} onOpenChange={(open) => !open && setDeletingTransaction(null)}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Delete Transaction</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this transaction? This action cannot be undone.
-              {deletingTransaction && (
-                <div className="mt-2 p-3 bg-muted rounded-lg">
-                  <div className="font-medium">{deletingTransaction.category?.name || 'Unknown Category'}</div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {formatCurrency(deletingTransaction.amount)} • {formatDate(deletingTransaction.transaction_date)}
+      <AlertDialog open={!!deletingTransaction} onOpenChange={(open) => !open && setDeletingTransaction(null)}>
+        <AlertDialogContent className="sm:max-w-[500px]">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2.5 rounded-full bg-destructive/10 dark:bg-destructive/20">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <AlertDialogTitle className="text-left">Delete Transaction</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription className="text-left pl-11">
+              This action cannot be undone. The transaction will be permanently removed from your records.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {deletingTransaction && (
+            <div className="mt-2 mb-1 p-4 bg-gradient-to-br from-muted/80 to-muted/40 rounded-xl border border-border/50 shadow-sm space-y-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${
+                  deletingTransaction.transaction_type === 'income' 
+                    ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400' 
+                    : 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400'
+                }`}>
+                  {deletingTransaction.transaction_type === 'income' ? (
+                    <TrendingUp className="h-4 w-4" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
+                    Category
+                  </div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {deletingTransaction.category?.name || 'Unknown Category'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <DollarSign className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
+                    Amount
+                  </div>
+                  <div className={`text-lg font-bold ${
+                    deletingTransaction.transaction_type === 'income' 
+                      ? 'text-emerald-600 dark:text-emerald-400' 
+                      : 'text-rose-600 dark:text-rose-400'
+                  }`}>
+                    {deletingTransaction.transaction_type === 'income' ? '+' : '-'}
+                    {formatCurrency(deletingTransaction.amount)}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Calendar className="h-4 w-4" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
+                    Date
+                  </div>
+                  <div className="text-sm font-medium text-foreground">
+                    {formatDate(deletingTransaction.transaction_date)}
+                  </div>
+                </div>
+              </div>
+
+              {deletingTransaction.description && (
+                <div className="flex items-start gap-3 pt-2 border-t border-border/50">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary mt-0.5">
+                    <FileText className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                      Description
+                    </div>
+                    <p className="text-sm text-foreground leading-relaxed">
+                      {deletingTransaction.description}
+                    </p>
                   </div>
                 </div>
               )}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeletingTransaction(null)}
-              disabled={isDeleting}
-            >
+            </div>
+          )}
+          <AlertDialogFooter className="gap-2 sm:gap-0 mt-4">
+            <AlertDialogCancel onClick={() => setDeletingTransaction(null)} disabled={isDeleting}>
               Cancel
-            </Button>
-            <Button
-              variant="destructive"
+            </AlertDialogCancel>
+            <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
+              className="bg-destructive text-white hover:bg-destructive/90 focus:ring-destructive/20 dark:focus:ring-destructive/40 shadow-md hover:shadow-lg transition-all"
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              {isDeleting ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Transaction
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
