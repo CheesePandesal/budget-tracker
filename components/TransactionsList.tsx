@@ -92,9 +92,9 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
             key={transaction.id}
             className="p-4 sm:p-6 hover:bg-muted/30 transition-colors group"
           >
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4">
               <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
-                <div className={`p-2 sm:p-3 rounded-xl ${
+                <div className={`p-2 sm:p-3 rounded-xl shrink-0 ${
                   transaction.transaction_type === 'income' 
                     ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950/30' 
                     : 'bg-rose-50 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 group-hover:bg-rose-100 dark:group-hover:bg-rose-950/30'
@@ -111,7 +111,7 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
                       {transaction.category?.name || 'Unknown Category'}
                     </h4>
                     {transaction.tags && transaction.tags.length > 0 && (
-                      <div className="flex space-x-1">
+                      <div className="flex space-x-1 shrink-0">
                         {transaction.tags.slice(0, 2).map((tag) => (
                           <span
                             key={tag}
@@ -151,9 +151,9 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="text-right">
-                  <div className={`text-lg sm:text-2xl font-bold ${
+              <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-3 shrink-0">
+                <div className="text-right sm:text-left">
+                  <div className={`text-lg sm:text-2xl font-bold whitespace-nowrap ${
                     transaction.transaction_type === 'income' 
                       ? 'text-emerald-600 dark:text-emerald-400' 
                       : 'text-rose-600 dark:text-rose-400'
@@ -162,11 +162,11 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
                     {formatCurrency(transaction.amount)}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                    className="h-8 w-8 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary active:bg-primary/20"
                     onClick={() => setEditingTransaction(transaction)}
                     aria-label="Edit transaction"
                   >
@@ -175,7 +175,7 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
+                    className="h-8 w-8 sm:h-8 sm:w-8 p-0 hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20"
                     onClick={() => setDeletingTransaction(transaction)}
                     aria-label="Delete transaction"
                   >
