@@ -49,7 +49,7 @@ export function AddTransactionDialog({ categories, trigger }: AddTransactionDial
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-[700px] max-h-[95vh] overflow-y-auto mx-2 sm:mx-0 p-4 sm:p-6 sm:max-h-[90vh]">
+      <DialogContent className="lg:w-[95vw] lg:max-w-[700px] max-h-[95vh] overflow-y-auto mx-2 sm:mx-0 p-4 sm:p-6 sm:max-h-[90vh]">
         <DialogHeader className="space-y-2 sm:space-y-3 pb-2 sm:pb-4 relative">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground pr-8">Add New Transaction</DialogTitle>
           <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
