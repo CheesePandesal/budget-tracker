@@ -64,7 +64,7 @@ export default async function TransactionsPage() {
         </CardHeader>
         <CardContent className="p-0">
           <Suspense fallback={<TransactionsListSkeleton />}>
-            <TransactionsList transactions={transactions} />
+            <TransactionsList transactions={transactions} categories={categories} />
           </Suspense>
         </CardContent>
       </Card>

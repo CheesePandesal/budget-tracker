@@ -16,6 +16,7 @@ interface TransactionFormProps {
   onSubmit: (data: CreateTransactionData) => Promise<void>;
   initialData?: Partial<TransactionFormData>;
   isSubmitting?: boolean;
+  mode?: 'create' | 'edit';
 }
 
 const paymentMethods = [
@@ -29,7 +30,7 @@ const paymentMethods = [
   'Other'
 ];
 
-export function TransactionForm({ categories, onSubmit, initialData, isSubmitting = false }: TransactionFormProps) {
+export function TransactionForm({ categories, onSubmit, initialData, isSubmitting = false, mode = 'create' }: TransactionFormProps) {
   const [formData, setFormData] = useState<TransactionFormData>({
     category_id: initialData?.category_id || '',
     amount: initialData?.amount || '',
@@ -63,18 +64,20 @@ export function TransactionForm({ categories, onSubmit, initialData, isSubmittin
 
     try {
       await onSubmit(transactionData);
-      // Reset form after successful submission
-      setFormData({
-        category_id: '',
-        amount: '',
-        description: '',
-        transaction_date: new Date().toISOString().split('T')[0],
-        transaction_type: 'expense',
-        payment_method: '',
-        location: '',
-        tags: []
-      });
-      setTagInput('');
+      // Reset form after successful submission (only for create mode)
+      if (mode === 'create') {
+        setFormData({
+          category_id: '',
+          amount: '',
+          description: '',
+          transaction_date: new Date().toISOString().split('T')[0],
+          transaction_type: 'expense',
+          payment_method: '',
+          location: '',
+          tags: []
+        });
+        setTagInput('');
+      }
     } catch (error) {
       console.error('Failed to create transaction:', error);
     }
@@ -372,10 +375,10 @@ export function TransactionForm({ categories, onSubmit, initialData, isSubmittin
           {isSubmitting ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Adding Transaction...
+              {mode === 'edit' ? 'Updating Transaction...' : 'Adding Transaction...'}
             </>
           ) : (
-            'Add Transaction'
+            mode === 'edit' ? 'Update Transaction' : 'Add Transaction'
           )}
         </Button>
       </div>
