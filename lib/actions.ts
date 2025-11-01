@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase-server';
-import { CreateTransactionData, Transaction, SavingsGoal } from '@/types';
+import { CreateTransactionData, Transaction, SavingsGoal, CreateSavingsGoalData } from '@/types';
 
 export async function createTransaction(formData: CreateTransactionData) {
   const supabase = await createClient();
@@ -138,16 +138,6 @@ export async function getCategories() {
 }
 
 // Savings Goals Actions
-export interface CreateSavingsGoalData {
-  name: string;
-  description?: string;
-  target_amount: number;
-  current_amount?: number;
-  target_date?: string;
-  priority: number;
-  is_achieved?: boolean;
-}
-
 export async function createSavingsGoal(formData: CreateSavingsGoalData) {
   const supabase = await createClient();
   
