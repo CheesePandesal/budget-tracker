@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { SavingsGoalForm } from '@/components/forms/SavingsGoalForm';
-import { CreateSavingsGoalData } from '@/lib/actions';
+import { CreateSavingsGoalData } from '@/types';
 import { Plus, CheckCircle2, Target, DollarSign, FileText } from 'lucide-react';
 import { createSavingsGoal } from '@/lib/actions';
 import { formatCurrency } from '@/lib/utils';
