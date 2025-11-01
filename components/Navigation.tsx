@@ -11,7 +11,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Transactions', href: '/transactions', icon: Wallet },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Goals', href: '/goals', icon: Target },
+  { name: 'Savings Goals', href: '/savings-goals', icon: Target },
 ];
 
 export function Navigation() {

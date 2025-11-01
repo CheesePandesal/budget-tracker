@@ -83,9 +83,9 @@ export default async function HomePage() {
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-md opacity-60">
+        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
           <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 p-3 sm:p-4 bg-primary/10 rounded-2xl w-fit">
+            <div className="mx-auto mb-4 p-3 sm:p-4 bg-primary/10 rounded-2xl w-fit group-hover:bg-primary/20 transition-colors">
               <Target className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
             </div>
             <CardTitle className="text-base sm:text-lg">Savings Goals</CardTitle>
@@ -94,15 +94,17 @@ export default async function HomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center pt-0">
-            <Button variant="outline" className="w-full" disabled>
-              Coming Soon
-            </Button>
+            <Link href="/savings-goals">
+              <Button variant="outline" className="w-full group-hover:bg-primary/10 group-hover:border-primary/20 transition-colors text-sm sm:text-base">
+                View Goals
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
-        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-md opacity-60">
+        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
           <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 p-3 sm:p-4 bg-violet-50 dark:bg-violet-950/20 rounded-2xl w-fit">
+            <div className="mx-auto mb-4 p-3 sm:p-4 bg-violet-50 dark:bg-violet-950/20 rounded-2xl w-fit group-hover:bg-violet-100 dark:group-hover:bg-violet-950/30 transition-colors">
               <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-violet-600 dark:text-violet-400" />
             </div>
             <CardTitle className="text-base sm:text-lg">Analytics</CardTitle>
@@ -111,9 +113,11 @@ export default async function HomePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center pt-0">
-            <Button variant="outline" className="w-full" disabled>
-              Coming Soon
-            </Button>
+            <Link href="/analytics">
+              <Button variant="outline" className="w-full group-hover:bg-violet-50 dark:group-hover:bg-violet-950/10 group-hover:border-violet-200 dark:group-hover:border-violet-800 transition-colors text-sm sm:text-base">
+                View Analytics
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
