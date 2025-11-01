@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProviderWrapper } from "@/components/TooltipProviderWrapper";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -66,13 +67,15 @@ export default function RootLayout({
         className={`${poppins.variable} antialiased`}
         suppressHydrationWarning={true}
       >
-        <Navigation />
-        <main className="lg:ml-64 min-h-screen bg-background">
-          <div className="pt-20 sm:pt-24 lg:pt-8 p-4 sm:p-6 lg:p-8">
-            {children}
-          </div>
-        </main>
-        <Toaster />
+        <TooltipProviderWrapper>
+          <Navigation />
+          <main className="lg:ml-64 min-h-screen bg-background">
+            <div className="pt-20 sm:pt-24 lg:pt-8 p-4 sm:p-6 lg:p-8">
+              {children}
+            </div>
+          </main>
+          <Toaster />
+        </TooltipProviderWrapper>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Transaction, Category } from '@/types';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Calendar, Edit, Trash2, AlertTriangle, DollarSign, FileText } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { AddTransactionDialog } from '@/components/AddTransactionDialog';
 import { EditTransactionDialog } from '@/components/EditTransactionDialog';
 import { Button } from '@/components/ui/button';
@@ -163,24 +164,44 @@ export function TransactionsList({ transactions, categories }: TransactionsListP
                   </div>
                 </div>
                 <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary active:bg-primary/20"
-                    onClick={() => setEditingTransaction(transaction)}
-                    aria-label="Edit transaction"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 sm:h-8 sm:w-8 p-0 hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20"
-                    onClick={() => setDeletingTransaction(transaction)}
-                    aria-label="Delete transaction"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 sm:h-8 sm:w-8 p-0 hover:bg-primary/10 hover:text-primary active:bg-primary/20"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingTransaction(transaction);
+                        }}
+                        aria-label="Edit transaction"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={8} align="center">
+                      Edit transaction
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 sm:h-8 sm:w-8 p-0 hover:bg-destructive/10 hover:text-destructive active:bg-destructive/20"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingTransaction(transaction);
+                        }}
+                        aria-label="Delete transaction"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={8} align="center">
+                      Delete transaction
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
             </div>
