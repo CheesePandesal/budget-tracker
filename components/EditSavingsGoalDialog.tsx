@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { SavingsGoalForm, SavingsGoalFormData } from '@/components/forms/SavingsGoalForm';
 import { SavingsGoal, CreateSavingsGoalData } from '@/types';
-import { Pencil, Target, DollarSign, FileText } from 'lucide-react';
+import { Pencil, Target, DollarSign, FileText, Calendar, Star } from 'lucide-react';
 import { updateSavingsGoal } from '@/lib/actions';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -182,6 +182,61 @@ export function EditSavingsGoalDialog({
                   </div>
                 </div>
               </div>
+              {pendingData.current_amount !== undefined && pendingData.current_amount > 0 && (
+                <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+                  <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400">
+                    <DollarSign className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
+                      Current Amount
+                    </div>
+                    <div className="text-base font-bold text-blue-600 dark:text-blue-400">
+                      {formatCurrency(pendingData.current_amount)}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {pendingData.target_date && (
+                <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+                  <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400">
+                    <Calendar className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
+                      Target Date
+                    </div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {new Date(pendingData.target_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {pendingData.priority && (
+                <div className="flex items-center gap-3 pt-2 border-t border-border/50">
+                  <div className={`p-2 rounded-lg ${
+                    pendingData.priority === 1
+                      ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400'
+                      : pendingData.priority === 2
+                      ? 'bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400'
+                      : 'bg-slate-50 dark:bg-slate-950/30 text-slate-600 dark:text-slate-400'
+                  }`}>
+                    <Star className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
+                      Priority
+                    </div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {pendingData.priority === 1 ? 'High Priority' : pendingData.priority === 2 ? 'Medium Priority' : 'Low Priority'}
+                    </div>
+                  </div>
+                </div>
+              )}
               {pendingData.description && (
                 <div className="flex items-start gap-3 pt-2 border-t border-border/50">
                   <div className="p-2 rounded-lg bg-primary/10 text-primary mt-0.5">

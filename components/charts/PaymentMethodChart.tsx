@@ -6,12 +6,16 @@ import { useEffect, useState } from 'react';
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-interface CategoryPieChartProps {
-  data: Array<{ name: string; amount: number }>;
-  total: number;
+interface PaymentMethodData {
+  method: string;
+  amount: number;
 }
 
-export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
+interface PaymentMethodChartProps {
+  data: PaymentMethodData[];
+}
+
+export function PaymentMethodChart({ data }: PaymentMethodChartProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [colors, setColors] = useState<string[]>([]);
 
@@ -35,14 +39,14 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
 
   if (!isMounted) {
     return (
-      <div className="w-full h-[300px] flex items-center justify-center">
+      <div className="w-full h-[350px] flex items-center justify-center">
         <div className="text-muted-foreground">Loading chart...</div>
       </div>
     );
   }
 
   // Handle empty data state
-  if (!data || data.length === 0 || total === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="w-full h-[350px] flex flex-col items-center justify-center text-center p-6">
         <div className="mb-4 p-4 bg-muted rounded-full">
@@ -56,17 +60,19 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
             />
           </svg>
         </div>
         <h3 className="text-lg font-semibold mb-2">No Data Available</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          There are no expense transactions for the selected period. Start adding expenses to see category breakdowns.
+          There are no expense transactions with payment methods. Add payment method information to see the breakdown.
         </p>
       </div>
     );
   }
+
+  const total = data.reduce((sum, item) => sum + item.amount, 0);
 
   const chartData = {
     series: data.map(item => item.amount),
@@ -78,7 +84,7 @@ export function CategoryPieChart({ data, total }: CategoryPieChartProps) {
         },
         fontFamily: 'inherit',
       },
-      labels: data.map(item => item.name),
+      labels: data.map(item => item.method),
       colors: colors,
       legend: {
         position: 'bottom' as const,

@@ -8,8 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Category, TransactionFormData, CreateTransactionData } from '@/types';
-import { Receipt, DollarSign, FileText, MapPin, Tag as TagIcon, Plus, X, Loader2 } from 'lucide-react';
+import { Receipt, DollarSign, FileText, MapPin, Tag as TagIcon, Plus, X, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface TransactionFormProps {
   categories: Category[];
@@ -43,6 +44,7 @@ export function TransactionForm({ categories, onSubmit, initialData, isSubmittin
   });
 
   const [tagInput, setTagInput] = useState('');
+  const [isCategorizingAI, setIsCategorizingAI] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +102,45 @@ export function TransactionForm({ categories, onSubmit, initialData, isSubmittin
     }));
   };
 
+  const handleAICategorize = async () => {
+    const description = formData.description;
+    if (!description || description.length < 3) {
+      toast.error('Please enter a description first');
+      return;
+    }
+
+    setIsCategorizingAI(true);
+    try {
+      const response = await fetch('/api/ai/categorize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          description,
+          transaction_type: formData.transaction_type 
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to categorize');
+      }
+
+      const { category_id, category_name, confidence } = await response.json();
+      
+      if (confidence > 0.6) {
+        setFormData(prev => ({ ...prev, category_id }));
+        toast.success(`✨ Categorized as "${category_name}" (${Math.round(confidence * 100)}% confident)`);
+      } else {
+        setFormData(prev => ({ ...prev, category_id }));
+        toast.warning(`Suggested: "${category_name}", but low confidence. Please verify.`);
+      }
+    } catch (error) {
+      console.error('AI categorization error:', error);
+      toast.error('AI categorization failed. Please select manually.');
+    } finally {
+      setIsCategorizingAI(false);
+    }
+  };
+
   const incomeCategories = categories.filter(cat => cat.is_income);
   const expenseCategories = categories.filter(cat => !cat.is_income);
 
@@ -142,9 +183,32 @@ export function TransactionForm({ categories, onSubmit, initialData, isSubmittin
 
             {/* Category */}
             <div className="space-y-2">
-              <Label htmlFor="category_id" className="text-sm font-medium text-foreground">
-                Category <span className="text-destructive">*</span>
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="category_id" className="text-sm font-medium text-foreground">
+                  Category <span className="text-destructive">*</span>
+                </Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleAICategorize}
+                  disabled={isCategorizingAI || !formData.description || formData.description.length < 3}
+                  className="h-7 text-xs px-2"
+                  title="Auto-categorize using AI"
+                >
+                  {isCategorizingAI ? (
+                    <>
+                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-1 h-3 w-3" />
+                      AI Categorize
+                    </>
+                  )}
+                </Button>
+              </div>
               <Select
                 value={formData.category_id}
                 onValueChange={(value) =>

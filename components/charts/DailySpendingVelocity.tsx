@@ -6,18 +6,16 @@ import { useEffect, useState } from 'react';
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-interface MonthlyData {
-  month: string;
-  totalIncome: number;
-  totalExpenses: number;
-  netAmount: number;
+interface DailyData {
+  day: number;
+  amount: number;
 }
 
-interface MonthlyBarChartProps {
-  data: MonthlyData[];
+interface DailySpendingVelocityProps {
+  data: DailyData[];
 }
 
-export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
+export function DailySpendingVelocity({ data }: DailySpendingVelocityProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -32,8 +30,11 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
     );
   }
 
+  // Filter out days with no spending for cleaner visualization
+  const filteredData = data.filter(d => d.amount > 0);
+
   // Handle empty data state
-  if (!data || data.length === 0) {
+  if (!data || filteredData.length === 0) {
     return (
       <div className="w-full h-[350px] flex flex-col items-center justify-center text-center p-6">
         <div className="mb-4 p-4 bg-muted rounded-full">
@@ -53,7 +54,7 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
         </div>
         <h3 className="text-lg font-semibold mb-2">No Data Available</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          There are no transactions for the selected period. Start adding transactions to see monthly trends.
+          There are no expense transactions for the selected period. Start adding expenses to see daily spending velocity.
         </p>
       </div>
     );
@@ -61,9 +62,6 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
 
   // Get chart colors from CSS variables
   const root = typeof document !== 'undefined' ? document.documentElement : null;
-  const incomeColor = root 
-    ? getComputedStyle(root).getPropertyValue('--chart-2').trim() || '#10b981'
-    : '#10b981';
   const expenseColor = root
     ? getComputedStyle(root).getPropertyValue('--destructive').trim() || '#ef4444'
     : '#ef4444';
@@ -71,49 +69,52 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
   const chartData = {
     series: [
       {
-        name: 'Income',
-        data: data.map(item => item.totalIncome),
-        color: incomeColor,
-      },
-      {
-        name: 'Expenses',
-        data: data.map(item => item.totalExpenses),
-        color: expenseColor,
+        name: 'Daily Spending',
+        data: data.map(item => item.amount),
       },
     ],
     options: {
       chart: {
-        type: 'bar' as const,
+        type: 'area' as const,
         toolbar: {
           show: false,
         },
         fontFamily: 'inherit',
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          borderRadius: 6,
+        zoom: {
+          enabled: false,
         },
       },
+      stroke: {
+        curve: 'smooth' as const,
+        width: 2,
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.7,
+          opacityTo: 0.3,
+          stops: [0, 100],
+        },
+      },
+      colors: [expenseColor],
       dataLabels: {
         enabled: false,
       },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
       xaxis: {
-        categories: data.map(item => {
-          const [year, month] = item.month.split('-');
-          const date = new Date(parseInt(year), parseInt(month) - 1);
-          return date.toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
-        }),
+        categories: data.map(item => item.day),
         labels: {
           style: {
             fontSize: '12px',
             fontFamily: 'inherit',
+          },
+        },
+        title: {
+          text: 'Day of Month',
+          style: {
+            fontSize: '14px',
+            fontFamily: 'inherit',
+            fontWeight: 600,
           },
         },
       },
@@ -132,9 +133,14 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
             fontFamily: 'inherit',
           },
         },
-      },
-      fill: {
-        opacity: 1,
+        title: {
+          text: 'Amount',
+          style: {
+            fontSize: '14px',
+            fontFamily: 'inherit',
+            fontWeight: 600,
+          },
+        },
       },
       tooltip: {
         theme: 'dark',
@@ -148,19 +154,15 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
           },
         },
       },
-      legend: {
-        position: 'top' as const,
-        horizontalAlign: 'right' as const,
-        fontSize: '14px',
-        fontFamily: 'inherit',
-        fontWeight: 400,
-        labels: {
-          colors: undefined,
-        },
-      },
       grid: {
         borderColor: undefined,
         strokeDashArray: 4,
+      },
+      markers: {
+        size: 3,
+        hover: {
+          size: 5,
+        },
       },
     },
   };
@@ -169,7 +171,7 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
     <Chart
       options={chartData.options as any}
       series={chartData.series}
-      type="bar"
+      type="area"
       height={350}
     />
   );

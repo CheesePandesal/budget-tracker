@@ -9,9 +9,22 @@ export async function createTransaction(formData: CreateTransactionData) {
   const supabase = await createClient();
   
   try {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    // TEMPORARY: For development - allow transactions without auth
+    // TODO: Remove this and implement proper authentication
+    const isAuthenticated = !authError && user;
+    
+    if (!isAuthenticated) {
+      console.warn('⚠️ Creating transaction without authentication (development mode)');
+    }
+
     const { data, error } = await supabase
       .from('transactions')
-      .insert([formData])
+      .insert([{
+        ...formData,
+        user_id: isAuthenticated ? user.id : null
+      }])
       .select(`
         *,
         category:categories(*)
@@ -25,6 +38,7 @@ export async function createTransaction(formData: CreateTransactionData) {
     // Revalidate the transactions page to show new data
     revalidatePath('/transactions');
     revalidatePath('/');
+    revalidatePath('/analytics');
     
     return { success: true, data };
   } catch (error) {
@@ -40,10 +54,22 @@ export async function updateTransaction(id: string, formData: Partial<CreateTran
   const supabase = await createClient();
   
   try {
-    const { data, error } = await supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    // TEMPORARY: For development - allow updates without auth
+    const isAuthenticated = !authError && user;
+    
+    let query = supabase
       .from('transactions')
       .update(formData)
-      .eq('id', id)
+      .eq('id', id);
+    
+    // Only filter by user_id if authenticated
+    if (isAuthenticated) {
+      query = query.eq('user_id', user.id);
+    }
+
+    const { data, error } = await query
       .select(`
         *,
         category:categories(*)
@@ -56,6 +82,7 @@ export async function updateTransaction(id: string, formData: Partial<CreateTran
 
     revalidatePath('/transactions');
     revalidatePath('/');
+    revalidatePath('/analytics');
     
     return { success: true, data };
   } catch (error) {
@@ -71,10 +98,22 @@ export async function deleteTransaction(id: string) {
   const supabase = await createClient();
   
   try {
-    const { error } = await supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    // TEMPORARY: For development - allow deletes without auth
+    const isAuthenticated = !authError && user;
+    
+    let query = supabase
       .from('transactions')
       .delete()
       .eq('id', id);
+    
+    // Only filter by user_id if authenticated
+    if (isAuthenticated) {
+      query = query.eq('user_id', user.id);
+    }
+
+    const { error } = await query;
 
     if (error) {
       throw new Error(`Failed to delete transaction: ${error.message}`);
@@ -82,6 +121,7 @@ export async function deleteTransaction(id: string) {
 
     revalidatePath('/transactions');
     revalidatePath('/');
+    revalidatePath('/analytics');
     
     return { success: true };
   } catch (error) {
@@ -93,20 +133,41 @@ export async function deleteTransaction(id: string) {
   }
 }
 
-export async function getTransactions(): Promise<Transaction[]> {
+export async function getTransactions(startDate?: string, endDate?: string): Promise<Transaction[]> {
   const supabase = await createClient();
   
   try {
-    const { data, error } = await supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    // TEMPORARY: For development - show all transactions if not authenticated
+    // TODO: Remove this and implement proper authentication
+    const isAuthenticated = !authError && user;
+
+    let query = supabase
       .from('transactions')
       .select(`
         *,
         category:categories(*)
-      `)
-      .order('transaction_date', { ascending: false });
+      `);
+
+    // Only filter by user_id if authenticated
+    if (isAuthenticated) {
+      query = query.eq('user_id', user.id);
+    }
+
+    // Apply date range filters if provided
+    if (startDate) {
+      query = query.gte('transaction_date', startDate);
+    }
+    if (endDate) {
+      query = query.lte('transaction_date', endDate);
+    }
+
+    const { data, error } = await query.order('transaction_date', { ascending: false });
 
     if (error) {
-      throw new Error(`Failed to fetch transactions: ${error.message}`);
+      console.error('Error fetching transactions:', error);
+      return [];
     }
 
     return data || [];
@@ -127,7 +188,8 @@ export async function getCategories() {
       .order('name');
 
     if (error) {
-      throw new Error(`Failed to fetch categories: ${error.message}`);
+      console.error('Error fetching categories:', error);
+      return [];
     }
 
     return data || [];
@@ -227,14 +289,27 @@ export async function getSavingsGoals(): Promise<SavingsGoal[]> {
   const supabase = await createClient();
   
   try {
-    const { data, error } = await supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    // TEMPORARY: For development - show all goals if not authenticated
+    const isAuthenticated = !authError && user;
+
+    let query = supabase
       .from('savings_goals')
-      .select('*')
+      .select('*');
+
+    // Only filter by user_id if authenticated
+    if (isAuthenticated) {
+      query = query.eq('user_id', user.id);
+    }
+
+    const { data, error } = await query
       .order('priority', { ascending: true })
       .order('created_at', { ascending: false });
 
     if (error) {
-      throw new Error(`Failed to fetch savings goals: ${error.message}`);
+      console.error('Error fetching savings goals:', error);
+      return [];
     }
 
     return data || [];

@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, TrendingUp, TrendingDown, Calendar, Tag, Wallet, X } from 'lucide-react';
 import { getTransactions, getCategories } from '@/lib/actions';
-import { formatCurrency, formatDate, calculateFinancialSummary } from '@/lib/utils';
+import { formatCurrency, formatDate, calculateFinancialSummary, formatMonth } from '@/lib/utils';
 import { Suspense } from 'react';
 import { TransactionsList } from '@/components/TransactionsList';
 import { AddTransactionDialog } from '@/components/AddTransactionDialog';
+import { NaturalLanguageTransactionDialog } from '@/components/NaturalLanguageTransactionDialog';
 import { StatsCards } from '@/components/StatsCards';
+import { FilterTransactionsControls } from '@/components/FilterTransactionsControls';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -15,13 +17,48 @@ export const metadata: Metadata = {
   description: 'View and manage all your family transactions. Track income and expenses with detailed categorization and filtering.',
 };
 
-export default async function TransactionsPage() {
+function getCurrentMonth() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+
+function getMonthDateRange(monthKey: string) {
+  if (monthKey === 'all') {
+    return { startDate: undefined, endDate: undefined };
+  }
+  
+  const [year, month] = monthKey.split('-');
+  const startDate = `${year}-${month}-01`;
+  
+  // Get last day of the month
+  const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+  const endDate = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+  
+  return { startDate, endDate };
+}
+
+export default async function TransactionsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ month?: string }>;
+}) {
+  const params = await searchParams;
+  const selectedMonth = params?.month || getCurrentMonth();
+  const { startDate, endDate } = getMonthDateRange(selectedMonth);
+  
   const [transactions, categories] = await Promise.all([
-    getTransactions(),
+    getTransactions(startDate, endDate),
     getCategories()
   ]);
 
   const { totalIncome, totalExpenses, netAmount } = calculateFinancialSummary(transactions);
+  
+  // Format the title with month information
+  const pageTitle = selectedMonth === 'all' 
+    ? 'Transactions' 
+    : `Transactions - ${formatMonth(selectedMonth)}`;
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -34,10 +71,13 @@ export default async function TransactionsPage() {
             </div>
             <span className="text-xs sm:text-sm font-medium text-primary">Financial Management</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Transactions</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{pageTitle}</h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">Track your family's income and expenses</p>
         </div>
-        <AddTransactionDialog categories={categories} />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <NaturalLanguageTransactionDialog categories={categories} />
+          <AddTransactionDialog categories={categories} />
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -50,16 +90,18 @@ export default async function TransactionsPage() {
       {/* Transactions List */}
       <Card className="shadow-lg">
         <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg sm:text-xl">Recent Transactions</CardTitle>
-              <CardDescription className="mt-1 text-sm sm:text-base">
-                Your latest income and expense entries
-              </CardDescription>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg sm:text-xl">Transactions</CardTitle>
+                <CardDescription className="mt-1 text-sm sm:text-base">
+                  Your income and expense entries
+                </CardDescription>
+              </div>
             </div>
-            <div className="text-xs sm:text-sm text-muted-foreground">
-              {transactions.length} {transactions.length === 1 ? 'transaction' : 'transactions'}
-            </div>
+            <FilterTransactionsControls 
+              currentMonth={selectedMonth}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-0">

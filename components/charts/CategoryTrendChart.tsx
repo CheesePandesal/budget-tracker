@@ -2,22 +2,22 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { formatMonth } from '@/lib/utils';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-interface MonthlyData {
+interface CategoryTrendData {
   month: string;
-  totalIncome: number;
-  totalExpenses: number;
-  netAmount: number;
+  amount: number;
 }
 
-interface MonthlyBarChartProps {
-  data: MonthlyData[];
+interface CategoryTrendChartProps {
+  data: CategoryTrendData[];
+  categoryName: string;
 }
 
-export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
+export function CategoryTrendChart({ data, categoryName }: CategoryTrendChartProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
   }
 
   // Handle empty data state
-  if (!data || data.length === 0) {
+  if (!data || data.length === 0 || data.every(d => d.amount === 0)) {
     return (
       <div className="w-full h-[350px] flex flex-col items-center justify-center text-center p-6">
         <div className="mb-4 p-4 bg-muted rounded-full">
@@ -47,13 +47,13 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
             />
           </svg>
         </div>
         <h3 className="text-lg font-semibold mb-2">No Data Available</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          There are no transactions for the selected period. Start adding transactions to see monthly trends.
+          There are no transactions in this category for the selected period.
         </p>
       </div>
     );
@@ -61,55 +61,38 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
 
   // Get chart colors from CSS variables
   const root = typeof document !== 'undefined' ? document.documentElement : null;
-  const incomeColor = root 
-    ? getComputedStyle(root).getPropertyValue('--chart-2').trim() || '#10b981'
-    : '#10b981';
-  const expenseColor = root
-    ? getComputedStyle(root).getPropertyValue('--destructive').trim() || '#ef4444'
-    : '#ef4444';
+  const categoryColor = root
+    ? getComputedStyle(root).getPropertyValue('--chart-1').trim() || '#3b82f6'
+    : '#3b82f6';
 
   const chartData = {
     series: [
       {
-        name: 'Income',
-        data: data.map(item => item.totalIncome),
-        color: incomeColor,
-      },
-      {
-        name: 'Expenses',
-        data: data.map(item => item.totalExpenses),
-        color: expenseColor,
+        name: categoryName,
+        data: data.map(item => item.amount),
       },
     ],
     options: {
       chart: {
-        type: 'bar' as const,
+        type: 'line' as const,
         toolbar: {
           show: false,
         },
         fontFamily: 'inherit',
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '55%',
-          borderRadius: 6,
+        zoom: {
+          enabled: false,
         },
       },
+      stroke: {
+        curve: 'smooth' as const,
+        width: 3,
+      },
+      colors: [categoryColor],
       dataLabels: {
         enabled: false,
       },
-      stroke: {
-        show: true,
-        width: 2,
-        colors: ['transparent'],
-      },
       xaxis: {
-        categories: data.map(item => {
-          const [year, month] = item.month.split('-');
-          const date = new Date(parseInt(year), parseInt(month) - 1);
-          return date.toLocaleDateString('en-PH', { month: 'short', year: 'numeric' });
-        }),
+        categories: data.map(item => formatMonth(item.month)),
         labels: {
           style: {
             fontSize: '12px',
@@ -133,9 +116,6 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
           },
         },
       },
-      fill: {
-        opacity: 1,
-      },
       tooltip: {
         theme: 'dark',
         y: {
@@ -148,19 +128,15 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
           },
         },
       },
-      legend: {
-        position: 'top' as const,
-        horizontalAlign: 'right' as const,
-        fontSize: '14px',
-        fontFamily: 'inherit',
-        fontWeight: 400,
-        labels: {
-          colors: undefined,
-        },
-      },
       grid: {
         borderColor: undefined,
         strokeDashArray: 4,
+      },
+      markers: {
+        size: 5,
+        hover: {
+          size: 7,
+        },
       },
     },
   };
@@ -169,7 +145,7 @@ export function MonthlyBarChart({ data }: MonthlyBarChartProps) {
     <Chart
       options={chartData.options as any}
       series={chartData.series}
-      type="bar"
+      type="line"
       height={350}
     />
   );

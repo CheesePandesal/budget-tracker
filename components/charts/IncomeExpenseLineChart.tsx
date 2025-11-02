@@ -32,6 +32,33 @@ export function IncomeExpenseLineChart({ data }: IncomeExpenseLineChartProps) {
     );
   }
 
+  // Handle empty data state
+  if (!data || data.length === 0) {
+    return (
+      <div className="w-full h-[350px] flex flex-col items-center justify-center text-center p-6">
+        <div className="mb-4 p-4 bg-muted rounded-full">
+          <svg
+            className="h-8 w-8 text-muted-foreground"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold mb-2">No Data Available</h3>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          There are no transactions for the selected period. Start adding transactions to see financial trends.
+        </p>
+      </div>
+    );
+  }
+
   // Get chart colors from CSS variables
   const root = typeof document !== 'undefined' ? document.documentElement : null;
   const incomeColor = root 
